@@ -7,7 +7,6 @@ const articleCollection = defineCollection({
     description: z.string(),
     category: z.enum(['info', 'setup', 'howto']).default('info'),
     order: z.number().min(1).max(10),
-    slug: z.string(),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
   }),
