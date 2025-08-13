@@ -1,0 +1,13 @@
+---
+export interface Props {
+  items: string[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="basic-list">
+  {items.map(item => (
+    <li set:html={item}></li>
+  ))}
+</ul>

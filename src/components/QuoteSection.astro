@@ -1,0 +1,13 @@
+---
+export interface Props {
+  text: string;
+  author: string;
+}
+
+const { text, author } = Astro.props;
+---
+
+<div class="quote-section">
+  <p class="quote-text">{text}</p>
+  <p class="quote-author">— {author}</p>
+</div>

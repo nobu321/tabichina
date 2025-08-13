@@ -1,0 +1,378 @@
+---
+import { 
+  getArticlesByCategory, 
+  type CategoryType
+} from '../utils/navigation-helpers';
+
+// カテゴリ別記事データ取得
+const infoArticles = await getArticlesByCategory('info');
+const setupArticles = await getArticlesByCategory('setup');
+const howtoArticles = await getArticlesByCategory('howto');
+
+// カテゴリ設定
+const categories = [
+  {
+    id: 'info',
+    name: '基本情報',
+    articles: infoArticles
+  },
+  {
+    id: 'setup', 
+    name: '準備設定',
+    articles: setupArticles
+  },
+  {
+    id: 'howto',
+    name: '使い方',
+    articles: howtoArticles
+  }
+];
+
+// 現在のページのパス
+const currentPath = Astro.url.pathname;
+---
+
+<!-- デスクトップナビゲーション -->
+<div class="header-navigation">
+  <nav class="desktop-nav">
+    <a href="/" class={`nav-item ${currentPath === '/' ? 'current' : ''}`}>ホーム</a>
+    
+    {categories.map((category) => (
+      <div class="nav-dropdown">
+        <span class="nav-item">{category.name}</span>
+        <div class="dropdown-menu">
+          {category.articles.map((article) => (
+            currentPath === `/${article.slug}` ? (
+              <span class="dropdown-item current">
+                {article.data.title}
+              </span>
+            ) : (
+              <a 
+                href={`/${article.slug}`} 
+                class="dropdown-item"
+              >
+                {article.data.title}
+              </a>
+            )
+          ))}
+        </div>
+      </div>
+    ))}
+  </nav>
+  
+  <!-- モバイルナビゲーション -->
+  <div class="mobile-navigation">
+    <div class="mobile-menu-content">
+      <a href="/" class={`mobile-nav-item ${currentPath === '/' ? 'current' : ''}`}>ホーム</a>
+      
+      <div class="mobile-categories-container">
+        {categories.map((category, index) => (
+          <div class="mobile-category">
+            <button 
+              class="category-toggle" 
+              data-category={category.id}
+              data-index={index}
+            >
+              <span class="category-name">{category.name}</span>
+              <span class="article-count">({category.articles.length})</span>
+              <span class="toggle-arrow">▼</span>
+            </button>
+            
+            <div class="category-articles" data-category={category.id}>
+              {category.articles.map((article) => (
+                currentPath === `/${article.slug}` ? (
+                  <span class={`mobile-article-item current`}>
+                    <span class="article-number">{String(article.data.order).padStart(2, '0')}</span>
+                    <span class="article-title">{article.data.title}</span>
+                  </span>
+                ) : (
+                  <a 
+                    href={`/${article.slug}`} 
+                    class="mobile-article-item"
+                  >
+                    <span class="article-number">{String(article.data.order).padStart(2, '0')}</span>
+                    <span class="article-title">{article.data.title}</span>
+                  </a>
+                )
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Header Navigation */
+.header-navigation {
+  position: relative;
+}
+
+/* Desktop Navigation */
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none;
+  }
+}
+
+.nav-item {
+  color: var(--on-primary);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.current {
+  background-color: rgba(255, 255, 255, 0.2);
+  font-weight: 600;
+}
+
+/* Dropdown */
+.nav-dropdown {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 250px;
+  background: var(--surface);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-3);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-0.5rem);
+  transition: all 0.2s ease;
+  z-index: 1000;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.nav-dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.dropdown-item:hover {
+  background: var(--ultra-light-red);
+}
+
+.dropdown-item.current {
+  background: var(--very-light-red);
+  color: var(--primary);
+  font-weight: 600;
+  cursor: default;
+}
+
+/* Mobile Navigation */
+.mobile-navigation {
+  display: none;
+  width: 100%;
+  background: var(--primary-variant);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .mobile-navigation {
+    display: block;
+  }
+}
+
+.mobile-menu-content {
+  padding: 0;
+}
+
+.mobile-nav-item {
+  display: block;
+  padding: 1rem 1.5rem;
+  color: var(--on-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
+  opacity: 0.9;
+}
+
+.mobile-nav-item:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border-left-color: rgba(255, 255, 255, 0.3);
+}
+
+.mobile-nav-item.current {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+  border-left-color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+}
+
+.mobile-categories-container {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-category {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.category-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  color: var(--on-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-toggle:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.category-toggle:active {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.category-name {
+  flex: 1;
+  text-align: left;
+}
+
+.article-count {
+  opacity: 0.7;
+  font-size: 0.85rem;
+  margin-right: 0.5rem;
+}
+
+.toggle-arrow {
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+}
+
+.category-toggle.expanded .toggle-arrow {
+  transform: rotate(180deg);
+}
+
+.category-articles {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: var(--surface);
+  border-left: 4px solid var(--primary);
+}
+
+.category-articles.expanded {
+  max-height: 500px;
+}
+
+.mobile-article-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.mobile-article-item:hover {
+  background: var(--ultra-light-red);
+}
+
+.mobile-article-item.current {
+  background: var(--very-light-red);
+  color: var(--primary);
+  font-weight: 600;
+  cursor: default;
+}
+
+.article-number {
+  font-family: 'Inter', monospace;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--primary);
+  min-width: 1.5rem;
+}
+
+.article-title {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.mobile-article-item.current .article-number {
+  color: var(--primary);
+}
+
+.mobile-article-item.current .article-title {
+  color: var(--primary);
+}
+</style>
+
+<script>
+// モバイルアコーディオン機能
+function initMobileAccordion() {
+  const categoryToggles = document.querySelectorAll('.category-toggle');
+  
+  categoryToggles.forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const categoryId = toggle.getAttribute('data-category');
+      const articles = document.querySelector(`.category-articles[data-category="${categoryId}"]`);
+      
+      if (!articles) return;
+      
+      const isExpanded = articles.classList.contains('expanded');
+      
+      // クリックされたカテゴリの状態を切り替え
+      if (isExpanded) {
+        articles.classList.remove('expanded');
+        toggle.classList.remove('expanded');
+      } else {
+        articles.classList.add('expanded');
+        toggle.classList.add('expanded');
+      }
+    });
+  });
+}
+
+// 初期化
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initMobileAccordion);
+} else {
+  initMobileAccordion();
+}
+
+// Astro View Transitions対応
+document.addEventListener('astro:page-load', initMobileAccordion);
+</script>

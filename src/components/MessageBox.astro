@@ -1,0 +1,216 @@
+---
+import { Icon } from 'astro-icon/components';
+
+export interface Props {
+  type: 'success' | 'error' | 'warning' | 'info' | 'urgent' | 'tip';
+  title?: string;
+  text?: string;
+}
+
+const { type, title, text } = Astro.props;
+
+// アイコンのマッピング
+const iconMap = {
+  success: 'mdi:check-circle',
+  error: 'mdi:close-circle',
+  warning: 'mdi:alert',
+  info: 'mdi:information',
+  urgent: 'mdi:alert-octagon',
+  tip: 'mdi:lightbulb'
+};
+
+// デフォルトタイトル
+const defaultTitles = {
+  success: '完了',
+  error: 'エラー',
+  warning: '注意',
+  info: 'お知らせ',
+  urgent: '重要',
+  tip: 'ヒント'
+};
+
+const displayTitle = title || defaultTitles[type];
+const iconName = iconMap[type];
+---
+
+<div class={`message-box message-box-${type}`}>
+  <div class="message-box-icon">
+    <Icon name={iconName} size={18} />
+  </div>
+  <div class="message-box-content">
+    {displayTitle && <div class="message-box-title">{displayTitle}</div>}
+    {text && <div class="message-box-text">{text}</div>}
+    {!text && <div class="message-box-slot"><slot /></div>}
+  </div>
+</div>
+
+<style>
+  .message-box {
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    animation: messageBoxSlideIn 0.5s ease-out;
+    border: 2px solid;
+  }
+
+  @keyframes messageBoxSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .message-box-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: white;
+  }
+
+  .message-box-content {
+    flex: 1;
+  }
+
+  .message-box-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 1rem;
+  }
+
+  .message-box-text,
+  .message-box-slot {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  /* Success */
+  .message-box-success {
+    background: linear-gradient(135deg, #f0fff4, #f7fffa);
+    border-color: var(--success);
+  }
+
+  .message-box-success .message-box-icon {
+    background: var(--success);
+  }
+
+  .message-box-success .message-box-title {
+    color: var(--success);
+  }
+
+  /* Error */
+  .message-box-error {
+    background: linear-gradient(135deg, #fef2f2, #fff5f5);
+    border-color: #dc2626;
+  }
+
+  .message-box-error .message-box-icon {
+    background: #dc2626;
+  }
+
+  .message-box-error .message-box-title {
+    color: #dc2626;
+  }
+
+  /* Warning */
+  .message-box-warning {
+    background: linear-gradient(135deg, #fffbeb, #fefcf3);
+    border-color: var(--warning);
+  }
+
+  .message-box-warning .message-box-icon {
+    background: var(--warning);
+  }
+
+  .message-box-warning .message-box-title {
+    color: var(--warning);
+  }
+
+  /* Info */
+  .message-box-info {
+    background: linear-gradient(135deg, #eff6ff, #f0f9ff);
+    border-color: #2563eb;
+  }
+
+  .message-box-info .message-box-icon {
+    background: #2563eb;
+  }
+
+  .message-box-info .message-box-title {
+    color: #2563eb;
+  }
+
+  /* Urgent */
+  .message-box-urgent {
+    background: linear-gradient(135deg, #fef2f2, #fff5f5);
+    border-color: var(--primary);
+  }
+
+  .message-box-urgent .message-box-icon {
+    background: var(--primary);
+  }
+
+  .message-box-urgent .message-box-title {
+    color: var(--primary);
+  }
+
+  /* Tip */
+  .message-box-tip {
+    background: linear-gradient(135deg, #f0fdf4, #f7fef8);
+    border-color: #22c55e;
+    position: relative;
+  }
+
+  .message-box-tip::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    width: 24px;
+    height: 24px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2322c55e' opacity='0.3'%3E%3Cpath d='M12,2A7,7 0 0,0 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H15A1,1 0 0,0 16,17V14.74C17.81,13.47 19,11.38 19,9A7,7 0 0,0 12,2M9,21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9V21Z'/%3E%3C/svg%3E");
+    background-size: contain;
+  }
+
+  .message-box-tip .message-box-icon {
+    background: #22c55e;
+  }
+
+  .message-box-tip .message-box-title {
+    color: #22c55e;
+  }
+
+  /* レスポンシブ対応 */
+  @media (max-width: 768px) {
+    .message-box {
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    
+    .message-box-icon {
+      width: 28px;
+      height: 28px;
+    }
+    
+    .message-box-title {
+      font-size: 0.95rem;
+    }
+    
+    .message-box-text,
+    .message-box-slot {
+      font-size: 0.9rem;
+    }
+  }
+</style>

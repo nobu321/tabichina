@@ -1,0 +1,4 @@
+User-agent: *
+
+# サイトマップの場所
+Sitemap: https://www.tabichina.jp/sitemap-index.xml

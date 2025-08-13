@@ -1,0 +1,29 @@
+---
+import { Icon } from 'astro-icon/components';
+
+export interface Feature {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export interface Props {
+  features: Feature[];
+}
+
+const { features } = Astro.props;
+---
+
+<ul class="feature-list">
+  {features.map(feature => (
+    <li class="feature-item">
+      <div class="feature-icon">
+        <Icon name={feature.icon} size={24} />
+      </div>
+      <div class="feature-content">
+        <h3>{feature.title}</h3>
+        <p>{feature.description}</p>
+      </div>
+    </li>
+  ))}
+</ul>

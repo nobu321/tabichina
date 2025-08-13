@@ -1,0 +1,452 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { Icon } from 'astro-icon/components';
+import Hero from '../components/Hero.astro';
+import { getCollection } from 'astro:content';
+
+// 記事データを取得してカテゴリ別にソート（draft記事を除外）
+const allArticles = await getCollection('articles', ({ data }) => {
+  return !data.draft;
+});
+
+// カテゴリ別にグループ化し、order順にソート
+const infoArticles = allArticles
+  .filter(article => article.data.category === 'info')
+  .sort((a, b) => a.data.order - b.data.order);
+
+const setupArticles = allArticles
+  .filter(article => article.data.category === 'setup')
+  .sort((a, b) => a.data.order - b.data.order);
+
+const howtoArticles = allArticles
+  .filter(article => article.data.category === 'howto')
+  .sort((a, b) => a.data.order - b.data.order);
+
+// カテゴリ設定
+const categories = [
+  {
+    number: '01',
+    title: '基礎情報',
+    description: 'まずはAlipayの必要性を理解し、選択判断に必要な情報を収集しましょう。',
+    articles: infoArticles
+  },
+  {
+    number: '02', 
+    title: '準備・設定',
+    description: 'アカウント作成から決済設定まで、出発前の準備を完了させます。',
+    articles: setupArticles
+  },
+  {
+    number: '03',
+    title: '使い方ガイド',
+    description: '基本操作をマスターし、現地での様々なシーンでの使い方を学習します。',
+    articles: howtoArticles
+  }
+];
+---
+
+<Layout 
+  title="Alipay完全ガイド"
+  description="中国旅行でAlipay（アリペイ）を安全に使うための完全ガイド。登録から実際の使い方まで、日本人向けに詳しく解説。"
+  showHero={false}
+>
+  <!-- Hero Section -->
+  <Hero
+    variant="homepage"
+    backgroundImage="waitan"
+    centerLogo={true}
+    titleImage="/logo/title.svg"
+    logoIcon="/logo/alipay-icon.svg"
+  />
+
+  <!-- Supervisor Profile Section -->
+  <div class="supervisor-profile">
+    <div class="homepage-container">
+      <div class="supervisor-badge">執筆者について</div>
+      <div class="supervisor-title">中国訪問足掛け15年のSE</div>
+      <div class="supervisor-description">
+        私が初めて中国に行ったのは、15年ほど前の北京でした。
+        それから比べ、中国社会は様々なことが本当に大きく変わったな、と感じます。
+      </div>
+      <div class="supervisor-description">
+        変化の速い中国、その中で特にAlipayに関してはきちんと最新情報がまとまった情報が見つけられませんでした。
+        そこで実際に中国で訪れる日本人に向けて、私の実体験に基づいて、最新情報をまとめています。
+        中国はいろんな意味でとても「おもしろい国」です。
+        実際に訪れる皆様のお役に立てれば幸いです。
+
+    </div>
+  </div>
+
+  <!-- Steps Section -->
+  <div class="steps" id="start">
+    <div class="homepage-container">
+
+      <!-- Dynamic Steps -->
+      {categories.map((category, categoryIndex) => (
+        <>
+          <div class="step">
+            <div class="step-header">
+              <div class="step-number">{category.number}</div>
+              <h3 class="display-3">{category.title}</h3>
+              <p class="step-description body-regular">
+                {category.description}
+              </p>
+            </div>
+            <div class="step-articles">
+              {category.articles.map((article) => (
+                <a href={`/${article.slug}`} class="step-article">
+                  <h4 class="article-title">{article.data.title}</h4>
+                  <span class="article-arrow">→</span>
+                </a>
+              ))}
+            </div>
+          </div>
+          
+        </>
+      ))}
+    </div>
+  </div>
+
+
+  <style>
+
+    /* Homepage Container - Override global styles */
+    .homepage-container {
+      max-width: 900px !important;
+      margin: 0 auto;
+      padding: 0 24px !important;
+    }
+
+    /* Typography System - Refined */
+    .display-1 {
+      font-size: clamp(2.75rem, 7vw, 4.75rem);
+      font-weight: 700;
+      line-height: 0.92;
+      letter-spacing: -0.035em;
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    }
+
+    .display-2 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 600;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+    }
+
+    .display-3 {
+      font-size: clamp(1.375rem, 3vw, 1.875rem);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+    }
+
+    .body-large {
+      font-size: clamp(1.125rem, 2.5vw, 1.25rem);
+      font-weight: 400;
+      line-height: 1.6;
+    }
+
+    .body-regular {
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.7;
+    }
+
+
+    /* Supervisor Profile Section */
+    .supervisor-profile {
+      padding: 48px 0;
+      text-align: center;
+      background: linear-gradient(135deg, #fcfcfd 0%, #f8fafc 100%);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .supervisor-badge {
+      display: inline-block;
+      background: rgba(211, 47, 47, 0.06);
+      color: var(--primary);
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 32px;
+      border: 1px solid rgba(211, 47, 47, 0.12);
+    }
+
+    .supervisor-title {
+      font-size: 18px;
+      color: var(--text-primary);
+      margin-bottom: 32px;
+      font-weight: 500;
+    }
+
+    .supervisor-description {
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* Steps Section */
+    .steps {
+      padding: 7rem 0;
+    }
+
+    .steps-intro {
+      margin-bottom: 6rem;
+      text-align: center;
+    }
+
+    .steps-intro h2 {
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .steps-intro p {
+      color: var(--text-secondary);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .step {
+      margin-bottom: 5rem;
+      position: relative;
+    }
+
+    .step:last-child {
+      margin-bottom: 0;
+    }
+
+    /* Step Header with Red System Backgrounds */
+    .step-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2.5rem 2rem;
+      border-radius: 16px;
+      position: relative;
+      box-shadow: var(--shadow-1);
+      background: linear-gradient(135deg, var(--ultra-light-red) 0%, var(--very-light-red) 100%);
+      border: 1px solid rgba(211, 47, 47, 0.08);
+    }
+
+    .step-number {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--primary), var(--primary-variant));
+      color: var(--on-primary);
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.25rem;
+      margin: 0 auto 1.5rem;
+      box-shadow: 0 4px 12px rgba(211, 47, 47, 0.25);
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+    }
+
+    .step-title {
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .step-description {
+      color: var(--text-secondary);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    /* Article List - Enhanced */
+    .step-articles {
+      display: grid;
+      gap: 1rem;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .step-article {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 0;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.3s ease;
+      border-bottom: 1px solid rgba(211, 47, 47, 0.08);
+      border-radius: 4px;
+    }
+
+    .step-article:last-child {
+      border-bottom: none;
+    }
+
+    .step-article:hover {
+      color: var(--primary);
+      padding-left: 1rem;
+      margin-left: -1rem;
+      background: rgba(211, 47, 47, 0.02);
+    }
+
+    .step-article:hover .article-arrow {
+      transform: translateX(6px);
+      color: var(--primary);
+    }
+
+    .article-title {
+      font-size: 1.0625rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      line-height: 1.4;
+      transition: color 0.3s ease;
+    }
+
+    .step-article:hover .article-title {
+      color: var(--primary);
+    }
+
+    .article-arrow {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    /* Quote - Enhanced */
+    .quote-accent {
+      position: relative;
+      padding: 3rem 0;
+      margin: 4rem 0;
+      text-align: center;
+    }
+
+    .quote-accent::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 2px;
+    }
+
+    .quote-accent p {
+      font-style: italic;
+      font-size: 1.1875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      max-width: 520px;
+      margin: 0 auto;
+      padding-top: 1rem;
+      font-weight: 300;
+    }
+
+
+    /* Mobile Responsive Design */
+    @media (max-width: 768px) {
+      .homepage-container {
+        padding: 0 16px !important;
+      }
+
+
+      .supervisor-profile {
+        padding: 32px 0;
+      }
+
+      .supervisor-title {
+        font-size: 16px;
+      }
+
+      .supervisor-description {
+        font-size: 15px;
+        line-height: 1.7;
+      }
+
+
+      .steps {
+        padding: 5rem 0;
+      }
+
+      .steps-intro {
+        margin-bottom: 4rem;
+      }
+
+      .step {
+        margin-bottom: 4rem;
+      }
+
+      .step-header {
+        padding: 2rem 1.5rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .step-number {
+        width: 44px;
+        height: 44px;
+        font-size: 1rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .step-articles {
+        max-width: 100%;
+        gap: 0.75rem;
+      }
+
+      .step-article {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 0;
+      }
+
+      .quote-accent {
+        margin: 3rem 0;
+        padding: 2.5rem 0;
+      }
+
+      .quote-accent p {
+        font-size: 1.0625rem;
+      }
+
+    }
+
+    /* Small Mobile */
+    @media (max-width: 480px) {
+
+      .steps-intro h2 br {
+        display: none;
+      }
+
+      .step-header {
+        padding: 1.5rem 1rem;
+      }
+
+      .step-articles {
+        gap: 0.5rem;
+      }
+
+      .step-article {
+        padding: 0.75rem 0;
+      }
+    }
+
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Focus styles */
+    a:focus,
+    button:focus {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+  </style>
+</Layout>

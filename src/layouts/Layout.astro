@@ -1,0 +1,343 @@
+---
+import { Icon } from 'astro-icon/components';
+import Hero from '../components/Hero.astro';
+import HeaderNavigation from '../components/HeaderNavigation.astro';
+import '../styles/global.css';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  breadcrumbs?: Array<{url?: string, label: string}>;
+  showHero?: boolean;
+  canonicalUrl?: string;
+  category?: 'info' | 'setup' | 'howto';
+}
+
+const { 
+  title = "Alipayの使い方 - 完全解説",
+  description = "中国旅行での決済をスムーズに。Alipay、WeChat Pay、UnionPayの使える場所、使えない場所から設定方法まで徹底解説。",
+  breadcrumbs,
+  showHero = true,
+  canonicalUrl,
+  category
+} = Astro.props;
+
+// 現在のパスとURLを取得
+const currentPath = Astro.url.pathname;
+const currentUrl = Astro.url.href;
+const baseUrl = Astro.site?.href || 'https://www.tabichina.jp';
+
+// カテゴリベースでヒーロー画像を選択（拡張子なしで画像名のみ指定）
+const getHeroImageSrc = () => {
+  if (category && ['info', 'setup', 'howto'].includes(category)) {
+    return category; // info, setup, howto
+  }
+  return 'waitan'; // デフォルト
+};
+const heroImageSrc = getHeroImageSrc();
+
+// SEO用のタイトルと説明文を決定
+const seoTitle = currentPath === "/" ? title : `${title} | Alipayの使い方`;
+const seoDescription = description;
+const seoCanonicalUrl = canonicalUrl || currentUrl;
+
+// 構造化データ（パンくず）の生成
+const breadcrumbJsonLd = breadcrumbs && breadcrumbs.length > 1 ? {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": breadcrumbs.map((item, index) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "name": item.label,
+    ...(item.url && { "item": new URL(item.url, baseUrl).href })
+  }))
+} : null;
+
+// Website構造化データの生成（ホームページのみ）
+const websiteJsonLd = currentPath === "/" ? {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Alipayの使い方",
+  "url": baseUrl,
+  "description": seoDescription,
+  "inLanguage": "ja-JP",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Alipayの使い方"
+  }
+} : null;
+
+// OGP画像のURLを生成
+const getOGPImageUrl = (): string => {
+  if (currentPath === "/") {
+    // トップページの場合
+    return new URL("/ogp/home.png", baseUrl).href;
+  } else {
+    // 記事ページの場合（パスからスラッグを抽出）
+    const slug = currentPath.replace(/^\//, '').replace(/\/$/, '') || 'home';
+    return new URL(`/ogp/articles/${slug}.png`, baseUrl).href;
+  }
+};
+
+const ogpImageUrl = getOGPImageUrl();
+---
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content={seoDescription}>
+    <title>{seoTitle}</title>
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href={seoCanonicalUrl}>
+    
+    <!-- Open Graph Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content={seoTitle}>
+    <meta property="og:description" content={seoDescription}>
+    <meta property="og:url" content={seoCanonicalUrl}>
+    <meta property="og:image" content={ogpImageUrl}>
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Alipayの使い方">
+    <meta property="og:locale" content="ja_JP">
+    
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content={seoTitle}>
+    <meta name="twitter:description" content={seoDescription}>
+    <meta name="twitter:image" content={ogpImageUrl}>
+    
+    <!-- Generator Meta -->
+    <meta name="generator" content={Astro.generator}>
+    
+    <!-- Robots Meta -->
+    <meta name="robots" content="index, follow">
+    
+    <!-- Language -->
+    <meta name="language" content="Japanese">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'; this.onload=null;">
+    
+    <!-- 構造化データ（パンくず） -->
+    {breadcrumbJsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
+    )}
+    
+    <!-- 構造化データ（Website） -->
+    {websiteJsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(websiteJsonLd)} />
+    )}
+    
+    <!-- Matomo -->
+    <script>
+      var _paq = window._paq = window._paq || [];
+      /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+      _paq.push(['trackPageView']);
+      _paq.push(['enableLinkTracking']);
+      (function() {
+        var u="https://mon.osanpomiti.com/mtm/";
+        _paq.push(['setTrackerUrl', u+'matomo.php']);
+        _paq.push(['setSiteId', '12']);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+        g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+      })();
+    </script>
+    <!-- End Matomo Code -->
+</head>
+<body>
+    <div class="progress-indicator">
+        <div class="progress-bar"></div>
+    </div>
+
+    <div class="app-bar">
+        <div class="app-bar-content">
+            <a href="/" class="app-bar-brand">
+                <img src="/logo/alipay-icon.svg" alt="Alipay" class="alipay-icon" />
+                <img src="/logo/title.svg" alt="Alipayの使い方ガイド" class="brand-logo" />
+            </a>
+            
+            <!-- Desktop Navigation -->
+            <HeaderNavigation />
+            
+            <!-- Mobile Menu Button -->
+            <button class="mobile-menu-toggle" aria-label="メニューを開く">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+        </div>
+        
+        <!-- Mobile Navigation (integrated with HeaderNavigation) -->
+        <div class="mobile-nav" id="mobileNavContainer">
+            <!-- HeaderNavigation's mobile content will be shown here -->
+        </div>
+    </div>
+
+    {showHero && title && (
+        <Hero
+            variant="article"
+            backgroundImage={heroImageSrc}
+            title={title}
+        />
+    )}
+
+    {breadcrumbs && (
+        <div class="nav-bar">
+            <div class="nav-pattern"></div>
+            <div class="container">
+                <nav class="nav-content">
+                    {breadcrumbs.map((item, index) => (
+                        <>
+                            {item.url ? (
+                                <a href={item.url} class="nav-link">{item.label}</a>
+                            ) : (
+                                <span>{item.label}</span>
+                            )}
+                            {index < breadcrumbs.length - 1 && <Icon name="mdi:chevron-right" class="nav-separator" />}
+                        </>
+                    ))}
+                </nav>
+            </div>
+        </div>
+    )}
+
+    <main>
+        <slot />
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand-full">
+                <img src="/logo/title.svg" alt="Alipayの使い方ガイド" class="footer-brand-logo" />
+                <p class="footer-description">
+                    中国旅行での決済をスムーズに。Alipayの使い方から注意点まで、実体験に基づいた情報をお届けします。
+                </p>
+            </div>
+            
+            <div class="footer-links-grid">
+                <div class="footer-section">
+                    <h4>基礎情報</h4>
+                    <ul>
+                        <li><a href="/alipay-guide">必要性</a></li>
+                        <li><a href="/alipay-comparison-guide">比較検討</a></li>
+                        <li><a href="/alipay-coverage-analysis">利用範囲</a></li>
+                        <li><a href="/cash-reality-china">現金事情</a></li>
+                        <li><a href="/alipay-safety-security">安全性</a></li>
+                        <li><a href="/alipay-specifications-guide">仕様詳細</a></li>
+                        <li><a href="/tour-pass-obsolete-guide">ツアーパス</a></li>
+                        <li><a href="/passport-necessity-guide">パスポート要否</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>準備・設定</h4>
+                    <ul>
+                        <li><a href="/alipay-registration-guide">アカウント登録</a></li>
+                        <li><a href="/alipay-card-setup-guide">カード設定</a></li>
+                        <li><a href="/alipay-passport-verification-guide">パスポート認証</a></li>
+                        <li><a href="/alipay-test-payment-guide">テスト決済</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>使い方ガイド</h4>
+                    <ul>
+                        <li><a href="/alipay-complete-action-guide">基本操作</a></li>
+                        <li><a href="/alipay-shopping-convenience-complete">コンビニ決済</a></li>
+                        <li><a href="/alipay-restaurant-ordering-complete">飲食店注文</a></li>
+                        <li><a href="/transport">交通機関</a></li>
+                        <li><a href="/alipay-payment-troubleshooting-guide">トラブル対処</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2025 Alipayの使い方ガイド. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Progress indicator and scroll behavior
+        let lastScrollTop = 0;
+        let scrollTimeout;
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.body.offsetHeight;
+            const winHeight = window.innerHeight;
+            const scrollPercent = scrollTop / (docHeight - winHeight);
+            const progressBar = document.querySelector('.progress-bar');
+            const appBar = document.querySelector('.app-bar');
+            
+            // Update progress bar
+            if (progressBar) {
+                progressBar.style.width = scrollPercent * 100 + '%';
+            }
+            
+            // Always show header on all devices
+            appBar.style.transform = 'translateY(0)';
+            
+            // Add shadow when scrolled
+            if (scrollTop > 10) {
+                appBar.classList.add('app-bar-scrolled');
+            } else {
+                appBar.classList.remove('app-bar-scrolled');
+            }
+            
+            lastScrollTop = scrollTop;
+        });
+
+        // Mobile menu toggle
+        function initMobileMenuToggle() {
+            const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+            const mobileNav = document.querySelector('.mobile-nav');
+            const appBar = document.querySelector('.app-bar');
+            const mobileNavigation = document.querySelector('.mobile-navigation');
+            
+            if (mobileMenuToggle && mobileNav && mobileNavigation) {
+                // Move mobile navigation content into the mobile-nav container
+                mobileNav.innerHTML = '';
+                mobileNav.appendChild(mobileNavigation);
+                
+                mobileMenuToggle.addEventListener('click', () => {
+                    const isOpen = mobileNav.classList.contains('mobile-nav-open');
+                    
+                    if (isOpen) {
+                        mobileNav.classList.remove('mobile-nav-open');
+                        mobileMenuToggle.classList.remove('mobile-menu-active');
+                        appBar.classList.remove('app-bar-menu-open');
+                        mobileMenuToggle.setAttribute('aria-label', 'メニューを開く');
+                    } else {
+                        mobileNav.classList.add('mobile-nav-open');
+                        mobileMenuToggle.classList.add('mobile-menu-active');
+                        appBar.classList.add('app-bar-menu-open');
+                        mobileMenuToggle.setAttribute('aria-label', 'メニューを閉じる');
+                    }
+                });
+
+                // Close mobile menu when clicking on nav items
+                const mobileNavItems = document.querySelectorAll('.mobile-nav-item, .mobile-article-item');
+                mobileNavItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        mobileNav.classList.remove('mobile-nav-open');
+                        mobileMenuToggle.classList.remove('mobile-menu-active');
+                        appBar.classList.remove('app-bar-menu-open');
+                        mobileMenuToggle.setAttribute('aria-label', 'メニューを開く');
+                    });
+                });
+            }
+        }
+        
+        // Initialize mobile menu toggle
+        document.addEventListener('DOMContentLoaded', initMobileMenuToggle);
+        document.addEventListener('astro:page-load', initMobileMenuToggle);
+    </script>
+</body>
+</html>

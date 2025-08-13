@@ -1,0 +1,233 @@
+---
+import { Icon } from 'astro-icon/components';
+import type { CollectionEntry } from 'astro:content';
+import { 
+  getArticlesByCategory, 
+  getRelatedArticles, 
+  getPrevNextArticle, 
+  getArticlePosition, 
+  getCategoryName,
+  getRecommendedNext,
+  type CategoryType
+} from '../utils/navigation-helpers';
+
+export interface Props {
+  currentArticle: CollectionEntry<'articles'>;
+  position: 'hero' | 'bottom';
+}
+
+const { currentArticle, position } = Astro.props;
+
+// データ取得
+const recommendedNext = await getRecommendedNext(currentArticle);
+
+// 全カテゴリの記事データ取得
+const infoArticles = await getArticlesByCategory('info');
+const setupArticles = await getArticlesByCategory('setup');
+const howtoArticles = await getArticlesByCategory('howto');
+
+// 現在のカテゴリの記事
+const currentCategoryArticles = await getArticlesByCategory(currentArticle.data.category);
+
+// 他のカテゴリの記事数（記事下部タブ用）
+const otherCategories: CategoryType[] = ['info', 'setup', 'howto'].filter(cat => cat !== currentArticle.data.category) as CategoryType[];
+const otherCategoryCounts = await Promise.all(
+  otherCategories.map(async (category) => {
+    const articles = await getArticlesByCategory(category);
+    return { category, count: articles.length, articles: articles.slice(0, 4) };
+  })
+);
+---
+
+<div class={`article-navigation article-navigation--${position}`}>
+  {position === 'hero' && (
+    <div class="hero-navigation">
+      <!-- カテゴリ別タブナビ -->
+      <div class="category-tabs">
+        <div class="tab-navigation">
+          <button class={`tab-btn ${currentArticle.data.category === 'info' ? 'active' : ''}`} data-tab="info">
+            <Icon name="mdi:information" class="tab-icon" />
+            <span class="tab-label">基礎情報</span>
+          </button>
+          <button class={`tab-btn ${currentArticle.data.category === 'setup' ? 'active' : ''}`} data-tab="setup">
+            <Icon name="mdi:cog" class="tab-icon" />
+            <span class="tab-label">準備設定</span>
+          </button>
+          <button class={`tab-btn ${currentArticle.data.category === 'howto' ? 'active' : ''}`} data-tab="howto">
+            <Icon name="mdi:target" class="tab-icon" />
+            <span class="tab-label">使い方</span>
+          </button>
+        </div>
+
+        <div class="tab-content">
+          <!-- 基礎情報タブ -->
+          <div class={`tab-panel ${currentArticle.data.category === 'info' ? 'active' : ''}`} data-tab="info">
+            <div class="category-articles">
+              <div class="category-header">
+                <h4 class="category-title">基礎情報 ({infoArticles.length}記事)</h4>
+              </div>
+              <div class="article-list">
+                {infoArticles.map((article) => (
+                  <a 
+                    href={`/${article.slug}`} 
+                    class={`article-item ${article.slug === currentArticle.slug ? 'current' : ''}`}
+                  >
+                    <span class="article-number">{String(article.data.order).padStart(2, '0')}</span>
+                    <div class="article-content">
+                      <span class="article-title">{article.data.title}</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <!-- 準備設定タブ -->
+          <div class={`tab-panel ${currentArticle.data.category === 'setup' ? 'active' : ''}`} data-tab="setup">
+            <div class="category-articles">
+              <div class="category-header">
+                <h4 class="category-title">準備設定 ({setupArticles.length}記事)</h4>
+              </div>
+              <div class="article-list">
+                {setupArticles.map((article) => (
+                  <a 
+                    href={`/${article.slug}`} 
+                    class={`article-item ${article.slug === currentArticle.slug ? 'current' : ''}`}
+                  >
+                    <span class="article-number">{String(article.data.order).padStart(2, '0')}</span>
+                    <div class="article-content">
+                      <span class="article-title">{article.data.title}</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <!-- 使い方タブ -->
+          <div class={`tab-panel ${currentArticle.data.category === 'howto' ? 'active' : ''}`} data-tab="howto">
+            <div class="category-articles">
+              <div class="category-header">
+                <h4 class="category-title">使い方 ({howtoArticles.length}記事)</h4>
+              </div>
+              <div class="article-list">
+                {howtoArticles.map((article) => (
+                  <a 
+                    href={`/${article.slug}`} 
+                    class={`article-item ${article.slug === currentArticle.slug ? 'current' : ''}`}
+                  >
+                    <span class="article-number">{String(article.data.order).padStart(2, '0')}</span>
+                    <div class="article-content">
+                      <span class="article-title">{article.data.title}</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )}
+
+  {position === 'bottom' && (
+    <div class="bottom-navigation">
+      <!-- 次の記事プレビュー -->
+      {recommendedNext && (
+        <div class="next-article-preview">
+          <div class="preview-header">
+            <span class="preview-label">次の記事</span>
+            <div class="preview-meta">
+              <span class="meta-category">{getCategoryName(recommendedNext.data.category)}</span>
+              <span class="meta-number">#{String(recommendedNext.data.order).padStart(2, '0')}</span>
+            </div>
+          </div>
+          <div class="preview-content">
+            <h4 class="preview-title">{recommendedNext.data.title}</h4>
+            <p class="preview-description">{recommendedNext.data.description}</p>
+          </div>
+          <div class="preview-action">
+            <a href={`/${recommendedNext.slug}`} class="continue-reading-btn">
+              <span class="continue-text">続きを読む</span>
+              <Icon name="mdi:play" />
+            </a>
+          </div>
+        </div>
+      )}
+
+      <!-- 記事一覧に戻る -->
+      <div class="back-to-navigation">
+        <button class="back-to-nav-btn" data-scroll-to="hero-navigation">
+          <Icon name="mdi:format-list-bulleted" class="nav-icon" />
+          <span class="nav-text">記事一覧に戻る</span>
+          <Icon name="mdi:arrow-up" class="arrow-icon" />
+        </button>
+      </div>
+    </div>
+  )}
+</div>
+
+<script>
+  function initTabNavigation() {
+    // ヒーロー下タブの切り替え
+    document.querySelectorAll('[data-tab]').forEach(button => {
+      if (button.tagName === 'BUTTON') {
+        button.addEventListener('click', () => {
+          const tabId = button.getAttribute('data-tab');
+          if (!tabId) return;
+
+          // 同じコンテナ内のタブを切り替え
+          const container = button.closest('.category-tabs, .bottom-tabs');
+          if (!container) return;
+
+          // ボタンのアクティブ状態を切り替え
+          container.querySelectorAll('.tab-btn, .bottom-tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+          });
+          button.classList.add('active');
+
+          // パネルの表示を切り替え
+          container.querySelectorAll('.tab-panel, .bottom-tab-panel').forEach(panel => {
+            panel.classList.remove('active');
+          });
+          const targetPanel = container.querySelector(`[data-tab="${tabId}"].tab-panel, [data-tab="${tabId}"].bottom-tab-panel`);
+          if (targetPanel) {
+            targetPanel.classList.add('active');
+          }
+        });
+      }
+    });
+
+    // 記事一覧に戻るボタンのスムーススクロール
+    const backToNavBtn = document.querySelector('.back-to-nav-btn');
+    if (backToNavBtn) {
+      backToNavBtn.addEventListener('click', () => {
+        const heroNavigation = document.querySelector('.article-navigation--hero');
+        if (heroNavigation) {
+          heroNavigation.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+          });
+          
+          // スクロール後にフォーカスを移動（アクセシビリティ向上）
+          setTimeout(() => {
+            const firstTabButton = heroNavigation.querySelector('.tab-btn');
+            if (firstTabButton) {
+              firstTabButton.focus();
+            }
+          }, 500);
+        }
+      });
+    }
+  }
+
+  // DOMが読み込まれた時とページ遷移時に実行
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTabNavigation);
+  } else {
+    initTabNavigation();
+  }
+
+  // View Transitionsに対応
+  document.addEventListener('astro:page-load', initTabNavigation);
+</script>

@@ -1,0 +1,373 @@
+---
+/**
+ * ImageCard - エレガントな画像表示コンポーネント
+ * 
+ * ========================================
+ * ■ 必須プロパティ
+ * ========================================
+ * 
+ * src: string
+ *   画像ファイル名（拡張子なし）
+ *   例: "Screenshot_20250730-104634", "sha_waitan_promenade_001"
+ *   ※ src/assets/images/ 配下のファイルを自動検索
+ * 
+ * ========================================
+ * ■ 任意プロパティとデフォルト動作
+ * ========================================
+ * 
+ * type?: ImageType ('photo' | 'screenshot' | 'hero' | 'logo')
+ *   【省略時】: 自動推定
+ *   - src が "Screenshot" で始まる → type="screenshot"
+ *   - その他 → type="photo"
+ *   【指定時】: 自動推定を上書き
+ * 
+ * alt?: string
+ *   【省略時】: 自動生成（優先順位あり）
+ *   1. title が指定されている → title を使用
+ *   2. title も未指定 → "{type}の画像" を使用
+ *   【指定時】: 指定値を使用（アクセシビリティ重要）
+ * 
+ * title?: string
+ *   【省略時】: テキストエリア非表示（画像のみ表示）
+ *   【指定時】: 画像下部にタイトル表示 + テキストエリア表示
+ * 
+ * description?: string
+ *   【省略時】: 説明文なし
+ *   【指定時】: タイトル下に説明文表示 + テキストエリア表示
+ *   ※ title なし + description のみでも表示可能
+ * 
+ * ========================================
+ * ■ 表示パターン
+ * ========================================
+ * 
+ * パターン1: 画像のみ
+ *   title・description 両方なし → 画像のみ、テキストエリアなし
+ *   CSS: .image-card-only クラス適用
+ * 
+ * パターン2: 画像 + テキスト
+ *   title または description のいずれかが指定 → テキストエリア表示
+ *   CSS: .image-card-with-text クラス適用
+ * 
+ * ========================================
+ * ■ 使用例
+ * ========================================
+ * 
+ * 【最小構成】
+ * <ImageCard src="Screenshot_20250730-104634" />
+ * 
+ * 【画像 + タイトル】
+ * <ImageCard 
+ *   src="Screenshot_20250730-104634"
+ *   title="決済画面の確認方法"
+ * />
+ * 
+ * 【フル構成】
+ * <ImageCard
+ *   src="sha_waitan_promenade_001"
+ *   type="photo"
+ *   alt="上海外灘の夜景写真"
+ *   title="上海の象徴的な夜景"
+ *   description="現代中国の発展を象徴する美しいスカイライン。モバイル決済の普及とともに変化した都市の姿。"
+ *   class="special-highlight"
+ * />
+ * 
+ * 【type上書き例】
+ * <ImageCard 
+ *   src="Screenshot_20250730-104634" 
+ *   type="logo"
+ *   title="ロゴとして使用"
+ * />
+ * 
+ * ========================================
+ * ■ 画像サイズとレスポンシブ対応
+ * ========================================
+ * 
+ * width?: number (デフォルト: 600px)
+ *   OptimizedImage用の基準幅。実際の表示サイズはCSSで制御
+ * 
+ * height?: number (デフォルト: 自動)
+ *   アスペクト比維持で自動調整
+ * 
+ * 表示サイズ上限:
+ *   デスクトップ: 最大 550px × 700px
+ *   タブレット: 最大 450px × 800px  
+ *   モバイル: 画面幅100%（高さは比率維持）
+ * 
+ * ========================================
+ * ■ その他の高度なオプション
+ * ========================================
+ * 
+ * aspectRatio?: number - アスペクト比指定
+ * widths?: number[] - レスポンシブ幅配列
+ * sizes?: string - レスポンシブサイズ指定
+ * quality?: number - 画像品質 (0-100)
+ * loading?: 'eager' | 'lazy' - 読み込み方法 (デフォルト: lazy)
+ * class?: string - 追加CSSクラス
+ * 
+ * ========================================
+ * ■ 注意事項・ベストプラクティス
+ * ========================================
+ * 
+ * 1. アクセシビリティ: 装飾的でない画像は必ずalt指定推奨
+ * 2. SEO: titleは検索エンジンにとって重要な情報
+ * 3. パフォーマンス: loading="eager"は above-the-fold のみ
+ * 4. ファイル名規則: Screenshot_* は自動でtype="screenshot"
+ * 5. 画像最適化: OptimizedImageにより自動で webp/avif 生成
+ */
+
+import OptimizedImage from './OptimizedImage.astro';
+import type { ImageType } from './OptimizedImage.astro';
+
+export interface Props {
+  src: string;
+  alt?: string;
+  type?: ImageType;
+  title?: string;
+  description?: string;
+  width?: number;
+  height?: number;
+  class?: string;
+  // OptimizedImageの他のプロパティも渡せるように
+  aspectRatio?: number;
+  widths?: number[];
+  sizes?: string;
+  quality?: number;
+  loading?: 'eager' | 'lazy';
+}
+
+const { 
+  src,
+  alt,
+  type,
+  title,
+  description,
+  width,
+  height,
+  class: className = '',
+  aspectRatio,
+  widths,
+  sizes,
+  quality,
+  loading = 'lazy',
+  ...rest
+} = Astro.props;
+
+// typeの自動推定：明示指定がない場合、srcがScreenshotで始まればscreenshot、そうでなければphoto
+const inferredType: ImageType = type || (src.startsWith('Screenshot') ? 'screenshot' : 'photo');
+
+// altのフォールバック処理：alt未指定時はtitleを使用、両方なければtypeベースの説明
+const computedAlt = alt || title || `${inferredType}の画像`;
+
+// タイトルまたは説明文がある場合はテキスト付きモード
+const hasText = title || description;
+
+// デフォルトサイズの設定（OptimizedImage用の基準サイズ）
+// 実際の表示サイズはCSSで制御される
+const defaultWidth = width || 600;  // 基準幅（レスポンシブ画像生成用）
+const defaultHeight = height || undefined;  // 高さは自動（アスペクト比維持）
+
+// CSS クラスの設定
+const cardClass = hasText 
+  ? `image-card image-card-with-text ${className}`
+  : `image-card image-card-only ${className}`;
+---
+
+<div class={cardClass}>
+  <div class="image-card-image-container">
+    <OptimizedImage
+      src={src}
+      alt={computedAlt}
+      type={inferredType}
+      width={defaultWidth}
+      height={defaultHeight}
+      aspectRatio={aspectRatio}
+      widths={widths}
+      sizes={sizes}
+      quality={quality}
+      loading={loading}
+      class="image-card-image"
+      {...rest}
+    />
+  </div>
+  
+  {hasText && (
+    <div class="image-card-content">
+      {title && <h4 class="image-card-title">{title}</h4>}
+      {description && <p class="image-card-description">{description}</p>}
+    </div>
+  )}
+</div>
+
+<style>
+  /* Pattern 1: Elegant Card Display のスタイル */
+  .image-card {
+    background: var(--surface);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-2);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border);
+    margin: 40px auto;
+    max-width: 900px;
+  }
+
+  .image-card:hover {
+    box-shadow: var(--shadow-3);
+    transform: translateY(-8px);
+  }
+
+  /* 画像コンテナ - 縦横比を自動調整 */
+  .image-card-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: #F8FAFC;  /* 薄いグレー背景（透明PNG用） */
+  }
+
+  .image-card-image {
+    /* アスペクト比維持で最適サイズ表示 */
+    width: auto;
+    height: auto;
+    object-fit: contain;  /* 切り取りなし、全体表示 */
+    display: block;
+    border-radius: 8px;
+    /* デフォルトの最大サイズ（個別ルールで上書きされる） */
+    max-width: 550px;
+    max-height: 700px;
+  }
+
+  /* 画像のみの場合 - 余白なし */
+  .image-card-only .image-card-image-container {
+    padding: 0;
+  }
+
+  .image-card-only .image-card-image {
+    max-width: 750px;   /* 画像インパクト重視・現代的UI */
+    max-height: 700px;  /* デスクトップ画面収まり重視 */
+    border-radius: 20px; /* カードと同じ角丸でシームレス */
+  }
+
+  /* テキスト付きの場合（サイズ統一） */
+  .image-card-with-text .image-card-image-container {
+    padding: 20px 20px 0 20px;
+  }
+
+  .image-card-with-text .image-card-image {
+    max-width: 550px;   /* 記事バランス重視 */
+    max-height: 700px;  /* デスクトップ画面収まり重視 */
+  }
+
+  .image-card-content {
+    padding: 32px;
+  }
+
+  .image-card-title {
+    font-size: 1.375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  .image-card-description {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  /* レスポンシブ対応 */
+  @media (max-width: 1024px) {
+    .image-card-only .image-card-image,
+    .image-card-with-text .image-card-image {
+      max-width: 450px;
+      max-height: 800px;  /* タブレット: 少し大きめ許可 */
+    }
+  }
+
+  @media (max-width: 768px) {
+    .image-card {
+      margin: 30px auto;
+      border-radius: 16px;
+    }
+
+    .image-card-image-container {
+      padding: 16px;
+    }
+
+    /* 画像のみの場合は余白なし */
+    .image-card-only .image-card-image-container {
+      padding: 0;
+    }
+
+    /* モバイル: テキスト付きのパディングを最小化 */
+    .image-card-with-text .image-card-image-container {
+      padding: 3px 3px 0 3px;  /* 画面幅最大活用 */
+    }
+
+    .image-card-only .image-card-image,
+    .image-card-with-text .image-card-image {
+      max-width: 100%;    /* モバイル: 画面幅活用 */
+      /* 縦はアスペクト比で自動調整（制限なし） */
+    }
+
+    /* 画像のみの場合の角丸調整 */
+    .image-card-only .image-card-image {
+      border-radius: 16px; /* カードと同じ角丸 */
+    }
+
+    .image-card-content {
+      padding: 24px;
+    }
+
+    .image-card-title {
+      font-size: 1.25rem;
+      margin-bottom: 10px;
+    }
+
+    .image-card-description {
+      font-size: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .image-card {
+      margin: 24px auto;
+      border-radius: 12px;
+    }
+
+    .image-card-image-container {
+      padding: 12px;
+    }
+
+    /* 画像のみの場合は余白なし */
+    .image-card-only .image-card-image-container {
+      padding: 0;
+    }
+
+    /* 小画面: テキスト付きのパディングを最小化 */
+    .image-card-with-text .image-card-image-container {
+      padding: 3px 3px 0 3px;  /* 画面幅最大活用 */
+    }
+
+    .image-card-content {
+      padding: 20px;
+    }
+
+    /* 画像のみの場合の角丸調整 */
+    .image-card-only .image-card-image {
+      border-radius: 12px; /* カードと同じ角丸 */
+    }
+
+    .image-card-title {
+      font-size: 1.125rem;
+      margin-bottom: 8px;
+    }
+
+    .image-card-description {
+      font-size: 0.95rem;
+    }
+  }
+</style>

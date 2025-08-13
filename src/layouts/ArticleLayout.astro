@@ -1,0 +1,46 @@
+---
+import Layout from './Layout.astro';
+import ArticleNavigation from '../components/ArticleNavigation.astro';
+import { type CollectionEntry } from 'astro:content';
+import '../styles/article.css';
+import '../styles/article-navigation.css';
+
+export interface Props {
+  title: string;
+  description: string;
+  breadcrumbs?: Array<{url?: string, label: string}>;
+  canonicalUrl?: string;
+  category?: 'info' | 'setup' | 'howto';
+  currentArticle?: CollectionEntry<'articles'>;
+}
+
+const { 
+  title,
+  description,
+  breadcrumbs,
+  canonicalUrl,
+  category,
+  currentArticle
+} = Astro.props;
+---
+
+<Layout 
+  title={title}
+  description={description}
+  breadcrumbs={breadcrumbs}
+  showHero={true}
+  canonicalUrl={canonicalUrl}
+  category={category}
+>
+  <div class="article-container">
+    {currentArticle && (
+      <ArticleNavigation currentArticle={currentArticle} position="hero" />
+    )}
+    <div class="article-content">
+      <slot />
+    </div>
+    {currentArticle && (
+      <ArticleNavigation currentArticle={currentArticle} position="bottom" />
+    )}
+  </div>
+</Layout>

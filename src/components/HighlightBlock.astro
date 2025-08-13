@@ -1,0 +1,55 @@
+---
+// ガラス効果（グラスモーフィズム）強調ブロックコンポーネント
+---
+
+<div class="highlight-block">
+  <div class="highlight-block-content">
+    <slot />
+  </div>
+</div>
+
+<style>
+  /* ガラス効果（グラスモーフィズム）強調ブロック */
+  .highlight-block {
+    background: linear-gradient(135deg, rgba(211, 47, 47, 0.1), rgba(255, 87, 34, 0.05));
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 30px;
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(211, 47, 47, 0.1);
+  }
+
+  .highlight-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  }
+
+  .highlight-block-content {
+    position: relative;
+    z-index: 1;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+
+  /* レスポンシブ対応 */
+  @media (max-width: 768px) {
+    .highlight-block {
+      padding: 24px;
+      margin: 16px 0;
+      border-radius: 16px;
+    }
+    
+    .highlight-block-content {
+      font-size: 1rem;
+    }
+  }
+</style>

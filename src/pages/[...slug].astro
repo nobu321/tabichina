@@ -1,0 +1,39 @@
+---
+import { type CollectionEntry, getCollection } from 'astro:content';
+import ArticleLayout from '../layouts/ArticleLayout.astro';
+import { mdxComponents } from '../utils/mdx-components';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles', ({ data }) => {
+    return data.draft !== true;
+  });
+
+  return articles.map((article) => ({
+    params: { slug: article.slug },
+    props: { article }
+  }));
+}
+
+type Props = {
+  article: CollectionEntry<'articles'>;
+};
+
+const { article } = Astro.props;
+const { Content } = await article.render();
+
+// Breadcrumbs
+const breadcrumbs = [
+  { url: '/', label: 'ホーム' },
+  { label: article.data.title }
+];
+---
+
+<ArticleLayout
+  title={article.data.title}
+  description={article.data.description}
+  breadcrumbs={breadcrumbs}
+  category={article.data.category}
+  currentArticle={article}
+>
+  <Content components={mdxComponents} />
+</ArticleLayout>

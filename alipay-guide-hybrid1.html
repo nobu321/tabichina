@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alipay完全ガイド - 使える場所・使えない場所</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #D32F2F;
+            --primary-variant: #B71C1C;
+            --secondary: #FF5722;
+            --surface: #FFFFFF;
+            --background: #FAFAFA;
+            --on-primary: #FFFFFF;
+            --on-surface: #212121;
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            --border: #F1F5F9;
+            --border-light: #F8FAFC;
+            --success: #38A169;
+            --warning: #D69E2E;
+            --shadow-1: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-2: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-3: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --light-red: #FEE2E2;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.7;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+        }
+
+        /* Progress Bar from Variant 1 */
+        .progress-indicator {
+            position: fixed;
+            top: 64px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: transparent;
+            z-index: 999;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* App Bar from Variant 1 */
+        .app-bar {
+            background: var(--primary);
+            color: var(--on-primary);
+            box-shadow: var(--shadow-2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .app-bar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .app-bar h1 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            letter-spacing: 0.0125em;
+        }
+
+        /* Container from Variant 2 */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 48px;
+        }
+
+        /* Header from Variant 1 with Variant 3 spacing */
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-variant));
+            color: var(--on-primary);
+            padding: 120px 0 160px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.1;
+            background-image: radial-gradient(circle at 25% 25%, white 2px, transparent 2px),
+                            radial-gradient(circle at 75% 75%, white 2px, transparent 2px);
+            background-size: 60px 60px;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-title {
+            font-size: 3.5rem;
+            font-weight: 300;
+            margin-bottom: 32px;
+            letter-spacing: -0.025em;
+            line-height: 1.1;
+        }
+
+        .header-title .accent {
+            font-weight: 600;
+            display: block;
+            margin-top: 16px;
+        }
+
+        .header-subtitle {
+            font-size: 1.375rem;
+            font-weight: 400;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Navigation from Variant 2 */
+        .nav-bar {
+            background: var(--surface);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .nav-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-variant);
+        }
+
+        .nav-separator {
+            font-size: 16px;
+        }
+
+        /* Main Content with Variant 3 spacing */
+        main {
+            padding: 100px 0 140px;
+        }
+
+        .section-intro {
+            text-align: center;
+            margin-bottom: 120px;
+        }
+
+        .section-title {
+            font-size: 2.75rem;
+            font-weight: 500;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .section-description {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Grid System from Variant 2 with Variant 3 spacing */
+        .grid {
+            display: grid;
+            gap: 80px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        }
+
+        /* Card from Variant 2 with Variant 3 styling */
+        .card {
+            background: var(--surface);
+            border-radius: 16px;
+            box-shadow: var(--shadow-1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-3);
+            transform: translateY(-4px);
+        }
+
+        .card-header {
+            padding: 40px 40px 0;
+        }
+
+        .card-body {
+            padding: 0 40px 40px;
+        }
+
+        /* Badge from Variant 2 */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 24px;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 32px;
+        }
+
+        .badge-success {
+            background: var(--light-red);
+            color: var(--primary);
+        }
+
+        .badge-warning {
+            background: var(--border-light);
+            color: var(--text-muted);
+        }
+
+        .badge-icon {
+            font-size: 20px;
+        }
+
+        /* Title from Variant 2 with Variant 3 sizing */
+        .title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 48px;
+            line-height: 1.6;
+        }
+
+        /* List from Variant 2 with Variant 3 spacing */
+        .list {
+            list-style: none;
+        }
+
+        .list-item {
+            margin-bottom: 80px;
+        }
+
+        .list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Media Object from Variant 2 with Variant 3 sizing */
+        .media {
+            display: flex;
+            gap: 32px;
+            align-items: flex-start;
+        }
+
+        .media-object {
+            flex-shrink: 0;
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            box-shadow: var(--shadow-2);
+        }
+
+        .media-object-success {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .media-object-muted {
+            background: var(--border-light);
+            color: var(--text-muted);
+        }
+
+        .media-content {
+            flex: 1;
+        }
+
+        .media-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .media-description {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        /* Details section from Variant 3 */
+        .location-details {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-1);
+        }
+
+        .details-section {
+            margin-bottom: 32px;
+        }
+
+        .details-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .details-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+
+        .details-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        /* Metrics from Variant 3 */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 32px;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
+        .unavailable .metric-value {
+            color: var(--text-muted);
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Tags from Variant 2 with Variant 3 styling */
+        .tags-container {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            padding: 8px 16px;
+            border-radius: 24px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid;
+        }
+
+        .available .tag {
+            background: var(--light-red);
+            color: var(--primary);
+            border-color: rgba(220, 38, 38, 0.2);
+        }
+
+        .unavailable .tag {
+            background: var(--border-light);
+            color: var(--text-muted);
+            border-color: rgba(148, 163, 184, 0.2);
+        }
+
+        /* CTA Section from Variant 1 */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary), var(--primary-variant));
+            color: var(--on-primary);
+            padding: 80px 0;
+            text-align: center;
+            border-radius: 24px;
+            margin: 120px 0;
+            box-shadow: var(--shadow-3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-title {
+            font-size: 2.25rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+            letter-spacing: -0.01em;
+        }
+
+        .cta-description {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        .btn-raised {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 36px;
+            background: var(--surface);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 1.125rem;
+            box-shadow: var(--shadow-2);
+            transition: all 0.2s ease;
+        }
+
+        .btn-raised:hover {
+            box-shadow: var(--shadow-3);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            font-size: 24px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 32px;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title {
+                font-size: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 24px;
+            }
+
+            .app-bar-content {
+                padding: 0 16px;
+            }
+
+            .header {
+                padding: 80px 0 120px;
+            }
+
+            .header-title {
+                font-size: 2.25rem;
+            }
+
+            .header-subtitle {
+                font-size: 1.125rem;
+            }
+
+            main {
+                padding: 60px 0 100px;
+            }
+
+            .section-intro {
+                margin-bottom: 80px;
+            }
+
+            .section-title {
+                font-size: 2.25rem;
+            }
+
+            .grid {
+                gap: 60px;
+            }
+
+            .card-header,
+            .card-body {
+                padding: 32px;
+            }
+
+            .list-item {
+                margin-bottom: 60px;
+            }
+
+            .media {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .media-object {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+
+            .media-title {
+                font-size: 1.375rem;
+            }
+
+            .location-details {
+                padding: 24px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+
+            .cta-section {
+                padding: 60px 0;
+                margin: 80px 0;
+            }
+
+            .cta-title {
+                font-size: 1.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-indicator">
+        <div class="progress-bar"></div>
+    </div>
+
+    <div class="app-bar">
+        <div class="app-bar-content">
+            <span class="material-icons">payment</span>
+            <h1>Alipay利用ガイド</h1>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-pattern"></div>
+        <div class="container">
+            <div class="header-content">
+                <h1 class="header-title">
+                    Alipayが使える場所
+                    <span class="accent">使えない場所</span>
+                </h1>
+                <p class="header-subtitle">
+                    中国旅行での決済をスムーズにするために、実際の利用可能性を詳しく解説します
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="nav-bar">
+        <div class="container">
+            <nav class="nav-content">
+                <a href="#" class="nav-link">ホーム</a>
+                <span class="material-icons nav-separator">chevron_right</span>
+                <a href="#" class="nav-link">Alipayガイド</a>
+                <span class="material-icons nav-separator">chevron_right</span>
+                <span>使える場所・使えない場所</span>
+            </nav>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="section-intro">
+                <h2 class="section-title">利用状況の全体像</h2>
+                <p class="section-description">
+                    中国国内でのAlipay利用について、実際の体験談と最新の対応状況をもとに整理しました。旅行前の準備にお役立てください。
+                </p>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card available">
+                    <div class="card-header">
+                        <div class="badge badge-success">
+                            <span class="material-icons badge-icon">verified</span>
+                            利用可能エリア
+                        </div>
+                        <h3 class="title">使える場所</h3>
+                        <p class="subtitle">高確率で使用できる施設・サービスです。これらの場所では安心してAlipayをご利用いただけます。</p>
+                    </div>
+                    
+                    <div class="card-body">
+                        <ul class="list">
+                            <li class="list-item">
+                                <div class="media">
+                                    <div class="media-object media-object-success">
+                                        <span class="material-icons">store</span>
+                                    </div>
+                                    <div class="media-content">
+                                        <h4 class="media-title">大手コンビニエンスストア</h4>
+                                        <p class="media-description">
+                                            セブンイレブン、ファミリーマート、ローソンなど、主要コンビニチェーンでの利用。
+                                            24時間いつでも安心して決済できる最も確実な選択肢です。
+                                        </p>
+                                        <div class="location-details">
+                                            <div class="details-section">
+                                                <div class="details-label">利用詳細</div>
+                                                <div class="details-text">
+                                                    レジ横にAlipayのQRコードが設置されており、店員に「支付宝」と伝えるだけでスムーズに決済できます。
+                                                    ほぼ全ての商品で利用可能で、公共料金の支払いやチャージサービスにも対応している店舗が多数あります。
+                                                </div>
+                                                <div class="metrics-grid">
+                                                    <div class="metric">
+                                                        <div class="metric-value">99%</div>
+                                                        <div class="metric-label">対応率</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">24h</div>
+                                                        <div class="metric-label">営業時間</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">○</div>
+                                                        <div class="metric-label">公共料金</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tags-container">
+                                                <span class="tag">利用率最高</span>
+                                                <span class="tag">24時間対応</span>
+                                                <span class="tag">公共料金対応</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="list-item">
+                                <div class="media">
+                                    <div class="media-object media-object-success">
+                                        <span class="material-icons">restaurant</span>
+                                    </div>
+                                    <div class="media-content">
+                                        <h4 class="media-title">大手ファストフードチェーン</h4>
+                                        <p class="media-description">
+                                            マクドナルド、KFC、スターバックス、ピザハット、海底撈火鍋など、
+                                            国際的なブランドから中国系チェーンまで幅広く対応しています。
+                                        </p>
+                                        <div class="location-details">
+                                            <div class="details-section">
+                                                <div class="details-label">利用詳細</div>
+                                                <div class="details-text">
+                                                    店内での注文時はもちろん、各チェーンの公式アプリやデリバリーサービス経由での注文時にも
+                                                    Alipay決済が利用可能です。事前注文・決済により待ち時間を大幅に短縮できます。
+                                                </div>
+                                                <div class="metrics-grid">
+                                                    <div class="metric">
+                                                        <div class="metric-value">95%</div>
+                                                        <div class="metric-label">対応率</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">○</div>
+                                                        <div class="metric-label">アプリ連携</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">○</div>
+                                                        <div class="metric-label">デリバリー</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tags-container">
+                                                <span class="tag">アプリ注文対応</span>
+                                                <span class="tag">デリバリー対応</span>
+                                                <span class="tag">事前決済可能</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="list-item">
+                                <div class="media">
+                                    <div class="media-object media-object-success">
+                                        <span class="material-icons">shopping_bag</span>
+                                    </div>
+                                    <div class="media-content">
+                                        <h4 class="media-title">大型ショッピングモール</h4>
+                                        <p class="media-description">
+                                            万達広場、銀泰百貨、大悦城、IFSモールなど、主要都市の大型商業施設。
+                                            駐車場から飲食まで一貫してAlipayで完結できる利便性の高い環境です。
+                                        </p>
+                                        <div class="location-details">
+                                            <div class="details-section">
+                                                <div class="details-label">利用詳細</div>
+                                                <div class="details-text">
+                                                    モール全体でAlipayエコシステムが構築されており、駐車場料金、各店舗での買い物、
+                                                    フードコートでの食事まで、すべてをAlipayで統一できます。
+                                                </div>
+                                                <div class="metrics-grid">
+                                                    <div class="metric">
+                                                        <div class="metric-value">98%</div>
+                                                        <div class="metric-label">対応率</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">○</div>
+                                                        <div class="metric-label">駐車場決済</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">○</div>
+                                                        <div class="metric-label">割引連携</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tags-container">
+                                                <span class="tag">駐車場決済対応</span>
+                                                <span class="tag">モール専用特典</span>
+                                                <span class="tag">一体型サービス</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card unavailable">
+                    <div class="card-header">
+                        <div class="badge badge-warning">
+                            <span class="material-icons badge-icon">block</span>
+                            利用困難エリア
+                        </div>
+                        <h3 class="title">使えない場所</h3>
+                        <p class="subtitle">現金が必要な場所です。これらの施設では事前に十分な現金を準備してください。</p>
+                    </div>
+                    
+                    <div class="card-body">
+                        <ul class="list">
+                            <li class="list-item">
+                                <div class="media">
+                                    <div class="media-object media-object-muted">
+                                        <span class="material-icons">local_hospital</span>
+                                    </div>
+                                    <div class="media-content">
+                                        <h4 class="media-title">医療機関・病院</h4>
+                                        <p class="media-description">
+                                            公立病院、私立病院、クリニック、薬局での診療費や薬代。
+                                            中国の医療保険制度との関係で、現金での支払いが基本となります。
+                                        </p>
+                                        <div class="location-details">
+                                            <div class="details-section">
+                                                <div class="details-label">制限理由</div>
+                                                <div class="details-text">
+                                                    医療費は中国の社会保険制度と密接に関連しており、保険適用の確認や
+                                                    政府への報告義務があるため、現金または中国の銀行カードでの支払いが必要です。
+                                                    緊急時に備えて、医療費として十分な現金を準備しておくことが重要です。
+                                                </div>
+                                                <div class="metrics-grid">
+                                                    <div class="metric">
+                                                        <div class="metric-value">厳格</div>
+                                                        <div class="metric-label">制限レベル</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">必須</div>
+                                                        <div class="metric-label">現金準備</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">×</div>
+                                                        <div class="metric-label">代替手段</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tags-container">
+                                                <span class="tag">現金必須</span>
+                                                <span class="tag">保険制度関連</span>
+                                                <span class="tag">緊急時注意</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="list-item">
+                                <div class="media">
+                                    <div class="media-object media-object-muted">
+                                        <span class="material-icons">account_balance</span>
+                                    </div>
+                                    <div class="media-content">
+                                        <h4 class="media-title">政府機関・公的施設</h4>
+                                        <p class="media-description">
+                                            入国管理局、公安局、税務署、各種証明書発行機関での手数料支払い。
+                                            公的な手続きには政府指定の支払い方法のみが認められています。
+                                        </p>
+                                        <div class="location-details">
+                                            <div class="details-section">
+                                                <div class="details-label">制限理由</div>
+                                                <div class="details-text">
+                                                    政府機関での支払いは、会計監査や法的な透明性の確保のため、
+                                                    現金または政府指定の銀行システムを通じた支払いのみが認められています。
+                                                    ビザ関連手続きや各種証明書発行の際は、必ず現金を準備してください。
+                                                </div>
+                                                <div class="metrics-grid">
+                                                    <div class="metric">
+                                                        <div class="metric-value">絶対</div>
+                                                        <div class="metric-label">制限レベル</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">なし</div>
+                                                        <div class="metric-label">代替手段</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">要確認</div>
+                                                        <div class="metric-label">事前準備</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tags-container">
+                                                <span class="tag">現金のみ</span>
+                                                <span class="tag">政府指定方法</span>
+                                                <span class="tag">事前確認必要</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <li class="list-item">
+                                <div class="media">
+                                    <div class="media-object media-object-muted">
+                                        <span class="material-icons">landscape</span>
+                                    </div>
+                                    <div class="media-content">
+                                        <h4 class="media-title">地方都市・農村部</h4>
+                                        <p class="media-description">
+                                            3級都市以下の地方都市、農村部の商店や観光施設。
+                                            インターネット環境や決済インフラの整備状況により利用が制限される場合があります。
+                                        </p>
+                                        <div class="location-details">
+                                            <div class="details-section">
+                                                <div class="details-label">制限理由</div>
+                                                <div class="details-text">
+                                                    地方部では4G/5Gネットワークの電波状況が不安定な場合があり、
+                                                    リアルタイム決済に必要な通信環境が整っていない地域があります。
+                                                    地方旅行の際は、十分な現金を準備して出発することを強くおすすめします。
+                                                </div>
+                                                <div class="metrics-grid">
+                                                    <div class="metric">
+                                                        <div class="metric-value">不安定</div>
+                                                        <div class="metric-label">インフラ状況</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">必要</div>
+                                                        <div class="metric-label">現金準備</div>
+                                                    </div>
+                                                    <div class="metric">
+                                                        <div class="metric-value">限定</div>
+                                                        <div class="metric-label">ATM設置</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tags-container">
+                                                <span class="tag">インフラ限定</span>
+                                                <span class="tag">現金文化</span>
+                                                <span class="tag">事前準備必須</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <div class="container">
+                    <div class="cta-content">
+                        <h3 class="cta-title">次のステップ</h3>
+                        <p class="cta-description">
+                            Alipayの基本設定から実際の決済操作まで、ステップバイステップで詳しく解説します
+                        </p>
+                        <a href="#" class="btn-raised">
+                            <span class="material-icons btn-icon">arrow_forward</span>
+                            設定ガイドを見る
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Progress indicator
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.body.offsetHeight;
+            const winHeight = window.innerHeight;
+            const scrollPercent = scrollTop / (docHeight - winHeight);
+            const progressBar = document.querySelector('.progress-bar');
+            progressBar.style.width = scrollPercent * 100 + '%';
+        });
+    </script>
+</body>
+</html>

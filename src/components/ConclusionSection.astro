@@ -1,0 +1,164 @@
+---
+import { Icon } from 'astro-icon/components';
+
+export interface Props {
+  title: string;
+  text: string;
+}
+
+const { title, text } = Astro.props;
+---
+
+<div class="conclusion-wrapper">
+  <div class="conclusion-pattern"></div>
+  <div class="conclusion-section">
+  <div class="conclusion-sidebar">
+    <div class="conclusion-icon">
+      <Icon name="mdi:clipboard-check" />
+    </div>
+    <div class="conclusion-label">まとめ</div>
+  </div>
+  <div class="conclusion-main">
+    <h3 class="conclusion-title">{title}</h3>
+    <div class="conclusion-content" set:html={text}></div>
+  </div>
+  </div>
+</div>
+
+<style>
+.conclusion-wrapper {
+  background: linear-gradient(180deg, #EF5350, #E57373);
+  padding: 40px 0;
+  margin: 0 calc(-50vw + 50%) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.conclusion-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.1;
+  background-image: radial-gradient(circle at 25% 25%, white 2px, transparent 2px),
+                  radial-gradient(circle at 75% 75%, white 2px, transparent 2px);
+  background-size: 60px 60px;
+}
+
+.conclusion-section {
+  background: var(--surface);
+  border-radius: 24px;
+  overflow: visible;
+  margin: 0 auto;
+  max-width: 1200px;
+  box-shadow: var(--shadow-2);
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: 280px;
+  position: relative;
+  z-index: 1;
+}
+
+
+.conclusion-sidebar {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 50px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-top-left-radius: 24px;
+  border-bottom-left-radius: 24px;
+}
+
+.conclusion-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255, 255, 255, 0.05) 10px,
+    rgba(255, 255, 255, 0.05) 20px
+  );
+}
+
+.conclusion-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.conclusion-label {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  position: relative;
+  z-index: 1;
+}
+
+.conclusion-main {
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-top-right-radius: 24px;
+  border-bottom-right-radius: 24px;
+}
+
+.conclusion-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+
+.conclusion-content {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .conclusion-wrapper {
+    padding: 30px 0;
+    margin: 0 calc(-50vw + 50%) 0;
+  }
+  
+  .conclusion-section {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    margin: 0 24px;
+  }
+
+  .conclusion-sidebar {
+    padding: 40px 32px;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+    border-bottom-left-radius: 0;
+  }
+
+  .conclusion-main {
+    padding: 40px 32px;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+  }
+
+  .conclusion-title {
+    font-size: 1.75rem;
+  }
+}
+</style>

@@ -1,0 +1,202 @@
+---
+/**
+ * OptimizedImage - 最適化された画像表示コンポーネント
+ * 
+ * 使用方法：
+ * <OptimizedImage
+ *   src="alipay-registration-step1"   // 画像ファイル名（拡張子なしでOK）
+ *   type="screenshot"                  // 画像タイプ（photo, screenshot, hero, logo）
+ *   alt="Alipay登録画面"              // 代替テキスト（必須）
+ *   width={800}                       // 横幅（オプション）
+ *   height={600}                      // 高さ（オプション）
+ *   aspectRatio={4/3}                 // アスペクト比（オプション）
+ *   widths={[400, 800, 1200]}        // レスポンシブ幅（オプション）
+ *   sizes="..."                       // レスポンシブサイズ（オプション）
+ *   loading="lazy"                    // 読み込み方法（オプション）
+ *   class="rounded-lg"                // CSSクラス（オプション）
+ * />
+ * 
+ * 対応画像タイプ:
+ * - photo: 実写画像（風景、店舗、人物など）
+ * - screenshot: スクリーンショット（アプリ画面、UI画面など）
+ * - hero: ヒーロー画像（背景画像）
+ * - logo: ロゴ・ブランド画像
+ */
+
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { 
+  getImageWidths, 
+  getImageSizes, 
+  getImageQuality, 
+  getImageSize,
+  createImageImporter 
+} from '../utils/imageHelpers.js';
+
+// 画像タイプの定義
+export type ImageType = 'photo' | 'screenshot' | 'hero' | 'logo';
+
+// プロパティの型定義
+export interface Props {
+  src: string;
+  alt: string;
+  type: ImageType;
+  // サイズ関連
+  width?: number;
+  height?: number;
+  aspectRatio?: number;
+  // レスポンシブ関連
+  widths?: number[];
+  sizes?: string;
+  // 品質・フォーマット
+  quality?: number;
+  formats?: ('webp' | 'avif' | 'png' | 'jpg' | 'jpeg')[];
+  // その他の設定
+  loading?: 'eager' | 'lazy';
+  decoding?: 'async' | 'sync' | 'auto';
+  class?: string;
+  style?: string;
+  // フォールバック
+  fallback?: boolean;
+}
+
+// プロパティの取得
+const { 
+  src,
+  alt,
+  type,
+  width,
+  height,
+  aspectRatio,
+  widths,
+  sizes,
+  quality,
+  formats = ['webp'],
+  loading = 'lazy',
+  decoding = 'async',
+  class: className = '',
+  style = '',
+  fallback = true,
+  ...rest
+} = Astro.props;
+
+// 外部URLかどうかをチェック
+const isExternalUrl = src.startsWith('http') || src.startsWith('//');
+
+// 画像の解決
+let resolvedImage: ImageMetadata | undefined;
+let imageError = false;
+let errorMessage = '';
+
+if (!isExternalUrl) {
+  try {
+    // 内部画像の動的インポート
+    const imageImporter = createImageImporter(type, src);
+    const importResult = await imageImporter();
+    resolvedImage = importResult.default;
+  } catch (error) {
+    imageError = true;
+    errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.warn(`Failed to load image (${type}): ${src}`);
+  }
+}
+
+// サイズとレスポンシブ設定の計算
+const defaultSize = getImageSize(type);
+const defaultQuality = getImageQuality(type);
+
+// 最終的なサイズ設定
+const finalWidth = width || defaultSize.width;
+const finalHeight = height;
+const finalQuality = quality || defaultQuality;
+
+// レスポンシブ設定
+const finalWidths = widths || getImageWidths(type, finalWidth);
+const finalSizes = sizes || getImageSizes(type);
+
+// アスペクト比の設定
+let finalAspectRatio: number | undefined = undefined;
+if (aspectRatio) {
+  // 明示的にaspectRatioが指定された場合
+  finalAspectRatio = aspectRatio;
+} else if (width && height) {
+  // widthとheightが両方指定された場合
+  finalAspectRatio = width / height;
+} else if (width && !height && !aspectRatio) {
+  // widthのみ指定された場合は、Astroが元画像のアスペクト比を自動検出
+  finalAspectRatio = undefined;
+} else {
+  // デフォルトアスペクト比
+  finalAspectRatio = defaultSize.width / defaultSize.height;
+}
+
+// エラー時のプレースホルダースタイル
+const errorStyle = `
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f3f4f6;
+  border: 1px dashed #d1d5db;
+  color: #6b7280;
+  font-size: 12px;
+  text-align: center;
+  padding: 16px;
+  min-height: 200px;
+`;
+
+// 最終スタイルの作成
+const finalStyle = imageError 
+  ? `${errorStyle} width: ${finalWidth}px; ${style}`
+  : style;
+---
+
+{/* 外部URLの場合 */}
+{isExternalUrl && (
+  <img
+    src={src}
+    alt={alt}
+    width={finalWidth}
+    height={finalHeight}
+    loading={loading}
+    decoding={decoding}
+    class={className}
+    style={style}
+    sizes={finalSizes}
+    {...rest}
+  />
+)}
+
+{/* 内部画像でエラーがない場合 */}
+{!isExternalUrl && resolvedImage && !imageError && (
+  <Image
+    src={resolvedImage}
+    alt={alt}
+    width={finalWidth}
+    height={finalHeight}
+    widths={finalWidths}
+    sizes={finalSizes}
+    aspectRatio={finalAspectRatio}
+    quality={finalQuality}
+    formats={formats}
+    loading={loading}
+    decoding={decoding}
+    class={className}
+    style={style}
+    {...rest}
+  />
+)}
+
+{/* エラー時のプレースホルダー */}
+{imageError && (
+  <div 
+    class={`image-error-placeholder ${className}`} 
+    style={finalStyle} 
+    aria-hidden="true"
+  >
+    <div>
+      <strong>画像が見つかりません</strong><br/>
+      <small>タイプ: {type}</small><br/>
+      <small>ファイル: {src}</small>
+    </div>
+  </div>
+)}

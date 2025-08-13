@@ -1,0 +1,239 @@
+---
+import { Icon } from 'astro-icon/components';
+
+export interface Props {
+  question: string;
+  answer: string;
+  details: string;
+}
+
+const { question, answer, details } = Astro.props;
+---
+
+<div class="summary-wrapper">
+  <div class="summary-pattern"></div>
+  <div class="summary">
+  <div class="summary-header">
+    <div class="summary-main-label">
+      Summary
+    </div>
+  </div>
+  
+  <div class="summary-top">
+    <div class="summary-label">
+      <Icon name="mdi:help-circle" class="summary-label-icon" />
+      Question
+    </div>
+    <div class="summary-question">
+      <span class="summary-question-text">{question}</span>
+    </div>
+  </div>
+  <div class="summary-bottom">
+    <div class="summary-answer-label">
+      <Icon name="mdi:lightbulb-outline" class="summary-answer-label-icon" />
+      Answer
+    </div>
+    <div class="summary-answer">
+      <span set:html={answer} />
+    </div>
+    <div class="summary-details">
+      <Icon name="mdi:information-outline" class="summary-details-icon" />
+      <div class="summary-details-text">
+        <span set:html={details} />
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<style>
+.summary-wrapper {
+  background: linear-gradient(180deg, #EF5350, #E57373);
+  padding: 40px 0;
+  margin: 0 calc(-50vw + 50%);
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.1;
+  background-image: radial-gradient(circle at 25% 25%, white 2px, transparent 2px),
+                  radial-gradient(circle at 75% 75%, white 2px, transparent 2px);
+  background-size: 60px 60px;
+}
+
+.summary {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 40px;
+  margin: 0 auto;
+  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+}
+
+.summary-top::after {
+  content: '';
+  display: block;
+  margin: 28px 20px;
+  height: 2px;
+  background: var(--text-muted);
+  border-radius: 1px;
+  opacity: 0.3;
+}
+
+.summary-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.summary-main-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.summary-top {
+  margin-bottom: 0;
+}
+
+.summary-label,
+.summary-answer-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary);
+  color: white;
+  padding: 7px 16px;
+  border-radius: 7px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 18px;
+  width: 120px;
+  justify-content: center;
+}
+
+.summary-label-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: -1px;
+}
+
+.summary-answer-label-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.summary-question {
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+  line-height: 1.4;
+}
+
+.summary-question-text {
+  display: block;
+}
+
+.summary-bottom {
+  padding-top: 0;
+}
+
+.summary-answer {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 18px;
+  line-height: 1.4;
+}
+
+.summary-details {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.summary-details-icon {
+  color: var(--text-muted);
+  font-size: 20px;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.summary-details-text {
+  flex: 1;
+}
+
+
+
+@media (max-width: 768px) {
+  .summary-wrapper {
+    padding: 30px 0;
+    margin: 0 calc(-50vw + 50%);
+  }
+  
+  .summary {
+    padding: 32px 24px;
+    margin: 0 24px;
+  }
+  
+  .summary-top::after {
+    margin: 24px 16px;
+  }
+  
+  .summary-header {
+    margin-bottom: 28px;
+  }
+  
+  .summary-main-label {
+    font-size: 1rem;
+  }
+  
+  .summary-label,
+  .summary-answer-label {
+    width: 110px;
+  }
+  
+  .summary-question {
+    font-size: 1.25rem;
+  }
+  
+  .summary-answer {
+    font-size: 1.15rem;
+  }
+  
+  .summary-details {
+    gap: 10px;
+  }
+  
+  .summary-label-icon,
+  .summary-answer-label-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+  }
+  
+  .summary-details-icon {
+    font-size: 18px;
+  }
+}
+</style>

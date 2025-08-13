@@ -1,0 +1,366 @@
+---
+/**
+ * Hero - 統一ヒーロー表示コンポーネント
+ * 
+ * ホームページと記事ページの両方のヒーロー表示を統合
+ * 動的レスポンシブ対応とアクセシビリティを強化
+ */
+
+import OptimizedImage from './OptimizedImage.astro';
+
+// ヒーローバリアントの定義
+export type HeroVariant = 'homepage' | 'article';
+
+// プロパティの型定義
+export interface Props {
+  variant: HeroVariant;
+  backgroundImage: string;
+  // ホームページ用プロパティ
+  centerLogo?: boolean;
+  titleImage?: string;
+  logoIcon?: string;
+  // 記事用プロパティ
+  title?: string;
+  description?: string;
+  // 共通プロパティ
+  height?: string;
+  overlayOpacity?: number;
+  class?: string;
+}
+
+// プロパティの取得
+const {
+  variant,
+  backgroundImage,
+  centerLogo = false,
+  titleImage,
+  logoIcon = "/logo/alipay-icon.svg",
+  title,
+  description,
+  height,
+  overlayOpacity,
+  class: className = '',
+} = Astro.props;
+
+// バリアント別のデフォルト設定
+const isHomepage = variant === 'homepage';
+const isArticle = variant === 'article';
+
+// デフォルト高さの設定
+const defaultHeight = isHomepage 
+  ? 'var(--hero-height-homepage)' 
+  : 'var(--hero-height-article)';
+
+// オーバーレイ透明度の設定
+const defaultOverlayOpacity = isHomepage ? 0.7 : 0.6;
+const finalOverlayOpacity = overlayOpacity ?? defaultOverlayOpacity;
+
+// CSS変数の設定
+const cssVariables = {
+  '--hero-overlay-opacity': finalOverlayOpacity.toString(),
+  '--hero-height': height ?? defaultHeight,
+};
+---
+
+<div 
+  class={`hero hero--${variant} ${className}`}
+  style={cssVariables}
+>
+  <!-- Background Image -->
+  <div class="hero__image">
+    <OptimizedImage 
+      src={backgroundImage} 
+      type="hero" 
+      alt={isHomepage ? "上海外灘の夜景 - 中国の現代的な都市風景" : "ヒーロー画像"}
+      width={1920}
+      height={1080}
+      loading="eager"
+      decoding="sync"
+    />
+  </div>
+
+  <!-- Gradient Overlay -->
+  <div class="hero__overlay"></div>
+
+  <!-- Homepage Content -->
+  {isHomepage && (
+    <div class="hero__content hero__content--homepage">
+      {centerLogo && (
+        <div class="hero__center-logo">
+          <img src={logoIcon} alt="Alipay" class="hero__logo-icon" />
+        </div>
+      )}
+      
+      {titleImage && (
+        <div class="hero__content-wrapper">
+          <div class="hero__container">
+            <img src={titleImage} alt="Alipayの使い方ガイド" class="hero__title-logo" />
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+
+  <!-- Article Content -->
+  {isArticle && (title || Astro.slots.has('default')) && (
+    <div class="hero__content hero__content--article">
+      <div class="hero__container">
+        <div class="hero__text-content">
+          {title && (
+            <h1 class="hero__title" set:html={title}></h1>
+          )}
+          
+          <!-- Custom content slot -->
+          <slot />
+        </div>
+      </div>
+    </div>
+  )}
+</div>
+
+<style>
+  /* CSS Custom Properties for Static Configuration */
+  :root {
+    --hero-height-homepage: 35vh;
+    --hero-height-article: 35vh;
+    --hero-padding-horizontal: 48px;
+    --hero-overlay-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Base Hero Styles */
+  .hero {
+    position: relative;
+    height: var(--hero-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Background Image */
+  .hero__image {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* Gradient Overlay */
+  .hero__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(0, 0, 0, var(--hero-overlay-opacity)) 100%
+    );
+    transition: var(--hero-overlay-transition);
+  }
+
+  /* Content Container */
+  .hero__content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero__container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 48px;
+    height: 100%;
+  }
+
+  /* Homepage Variant */
+  .hero--homepage {
+    align-items: center;
+  }
+
+  .hero__content--homepage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero__center-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+  }
+
+  .hero__logo-icon {
+    height: 80px;
+    width: auto;
+    transition: var(--hero-overlay-transition);
+  }
+
+  .hero__content-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: 3rem;
+    text-align: center;
+  }
+
+  .hero__title-logo {
+    height: 40px;
+    width: auto;
+    transition: var(--hero-overlay-transition);
+  }
+
+  /* Article Variant */
+  .hero--article {
+    align-items: flex-end;
+    padding: 120px 0 30px;
+    min-height: var(--hero-height);
+    height: auto;
+  }
+
+  .hero__content--article {
+    display: flex;
+    align-items: flex-end;
+    padding: 30px 0;
+  }
+
+  .hero__text-content {
+    color: white;
+    text-align: center;
+    width: 100%;
+  }
+
+  .hero__title {
+    font-size: 3.5rem;
+    font-weight: 300;
+    margin-bottom: 0;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    transition: var(--hero-overlay-transition);
+  }
+
+  .hero__title .accent {
+    font-weight: 600;
+    display: block;
+    margin-top: 16px;
+  }
+
+
+  /* 3-Stage Responsive Design */
+  
+  /* Stage 1: Tablet (768px - 1023px) */
+  @media (max-width: 1023px) {
+    :root {
+      --hero-height-homepage: 35vh;
+      --hero-height-article: 40vh;
+    }
+    
+    .hero__container {
+      padding: 0 32px;
+    }
+    
+    .hero__logo-icon {
+      height: 70px;
+    }
+    
+    .hero__title-logo {
+      height: 36px;
+    }
+    
+    .hero__title {
+      font-size: 3rem;
+    }
+  }
+
+  /* Stage 2: Mobile (768px and below) */
+  @media (max-width: 767px) {
+    :root {
+      --hero-height-homepage: 40vh;
+      --hero-height-article: 50vh;
+    }
+    
+    .hero__container {
+      padding: 0 24px;
+    }
+    
+    .hero--article {
+      padding: 200px 0 20px;
+    }
+    
+    .hero__logo-icon {
+      height: 60px;
+    }
+    
+    .hero__title-logo {
+      height: 32px;
+    }
+    
+    .hero__title {
+      font-size: 2.25rem;
+    }
+    
+    .hero__content-wrapper {
+      padding-bottom: 2rem;
+    }
+  }
+
+  /* Stage 3: Small Mobile (480px and below) */
+  @media (max-width: 480px) {
+    .hero__container {
+      padding: 0 16px;
+    }
+    
+    .hero__content-wrapper {
+      padding-bottom: 1.5rem;
+    }
+  }
+
+  /* High DPI Displays */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx) {
+    .hero__title,
+    .hero__description {
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+  }
+
+  /* Accessibility & Performance */
+  @media (prefers-reduced-motion: reduce) {
+    .hero__overlay,
+    .hero__logo-icon,
+    .hero__title-logo,
+    .hero__title {
+      transition: none;
+    }
+  }
+
+  @media (prefers-contrast: high) {
+    .hero__overlay {
+      --hero-overlay-opacity: 0.85;
+    }
+    
+    .hero__title,
+    .hero__description {
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+    }
+  }
+
+  /* Focus Management */
+  .hero:focus-within .hero__overlay {
+    background: linear-gradient(
+      to bottom,
+      transparent 40%,
+      rgba(0, 0, 0, calc(var(--hero-overlay-opacity) + 0.1)) 100%
+    );
+  }
+</style>

@@ -1,0 +1,34 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - .astro/cache/**/*
+customHeaders:
+  - pattern: '**/*'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=86400'
+  - pattern: '*.html'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=86400'
+  - pattern: '/ogp/**/*'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=2592000'
+  - pattern: '/logo/**/*'
+    headers:
+      - key: 'Cache-Control'
+        value: 'public, max-age=2592000'

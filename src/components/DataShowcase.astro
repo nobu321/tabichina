@@ -1,0 +1,25 @@
+---
+export interface Metric {
+  number: string;
+  label: string;
+}
+
+export interface Props {
+  title: string;
+  metrics: Metric[];
+}
+
+const { title, metrics } = Astro.props;
+---
+
+<div class="data-showcase">
+  <h3 class="data-title">{title}</h3>
+  <div class="metrics-grid">
+    {metrics.map(metric => (
+      <div class="metric-item">
+        <span class="metric-number">{metric.number}</span>
+        <div class="metric-label">{metric.label}</div>
+      </div>
+    ))}
+  </div>
+</div>
