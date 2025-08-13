@@ -664,7 +664,8 @@ main {
     margin-top: 40px;
 }
 
-.footer-section h4 {
+.footer-section h4,
+.footer-section .footer-section-title {
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: 24px;

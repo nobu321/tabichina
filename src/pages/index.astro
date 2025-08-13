@@ -87,7 +87,7 @@ const categories = [
           <div class="step">
             <div class="step-header">
               <div class="step-number">{category.number}</div>
-              <h3 class="display-3">{category.title}</h3>
+              <h2 class="display-3">{category.title}</h2>
               <p class="step-description body-regular">
                 {category.description}
               </p>
@@ -95,7 +95,7 @@ const categories = [
             <div class="step-articles">
               {category.articles.map((article) => (
                 <a href={`/${article.slug}`} class="step-article">
-                  <h4 class="article-title">{article.data.title}</h4>
+                  <div class="article-title">{article.data.title}</div>
                   <span class="article-arrow">→</span>
                 </a>
               ))}

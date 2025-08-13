@@ -64,7 +64,7 @@ const otherCategoryCounts = await Promise.all(
           <div class={`tab-panel ${currentArticle.data.category === 'info' ? 'active' : ''}`} data-tab="info">
             <div class="category-articles">
               <div class="category-header">
-                <h4 class="category-title">基礎情報 ({infoArticles.length}記事)</h4>
+                <div class="category-title">基礎情報 ({infoArticles.length}記事)</div>
               </div>
               <div class="article-list">
                 {infoArticles.map((article) => (
@@ -86,7 +86,7 @@ const otherCategoryCounts = await Promise.all(
           <div class={`tab-panel ${currentArticle.data.category === 'setup' ? 'active' : ''}`} data-tab="setup">
             <div class="category-articles">
               <div class="category-header">
-                <h4 class="category-title">準備設定 ({setupArticles.length}記事)</h4>
+                <div class="category-title">準備設定 ({setupArticles.length}記事)</div>
               </div>
               <div class="article-list">
                 {setupArticles.map((article) => (
@@ -108,7 +108,7 @@ const otherCategoryCounts = await Promise.all(
           <div class={`tab-panel ${currentArticle.data.category === 'howto' ? 'active' : ''}`} data-tab="howto">
             <div class="category-articles">
               <div class="category-header">
-                <h4 class="category-title">使い方 ({howtoArticles.length}記事)</h4>
+                <div class="category-title">使い方 ({howtoArticles.length}記事)</div>
               </div>
               <div class="article-list">
                 {howtoArticles.map((article) => (
@@ -143,7 +143,7 @@ const otherCategoryCounts = await Promise.all(
             </div>
           </div>
           <div class="preview-content">
-            <h4 class="preview-title">{recommendedNext.data.title}</h4>
+            <div class="preview-title">{recommendedNext.data.title}</div>
             <p class="preview-description">{recommendedNext.data.description}</p>
           </div>
           <div class="preview-action">

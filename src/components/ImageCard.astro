@@ -172,7 +172,7 @@ const cardClass = hasText
   : `image-card image-card-only ${className}`;
 ---
 
-<div class={cardClass}>
+<figure class={cardClass}>
   <div class="image-card-image-container">
     <OptimizedImage
       src={src}
@@ -191,12 +191,12 @@ const cardClass = hasText
   </div>
   
   {hasText && (
-    <div class="image-card-content">
-      {title && <h4 class="image-card-title">{title}</h4>}
+    <figcaption class="image-card-content">
+      {title && <div class="image-card-title">{title}</div>}
       {description && <p class="image-card-description">{description}</p>}
-    </div>
+    </figcaption>
   )}
-</div>
+</figure>
 
 <style>
   /* Pattern 1: Elegant Card Display のスタイル */

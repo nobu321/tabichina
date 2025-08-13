@@ -13,7 +13,7 @@ const { title, metrics } = Astro.props;
 ---
 
 <div class="data-showcase">
-  <h3 class="data-title">{title}</h3>
+  <div class="data-title">{title}</div>
   <div class="metrics-grid">
     {metrics.map(metric => (
       <div class="metric-item">

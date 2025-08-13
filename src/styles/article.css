@@ -200,7 +200,8 @@ html, body {
     flex-shrink: 0;
 }
 
-.feature-content h3 {
+.feature-content h3,
+.feature-content .feature-title {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-primary);
@@ -423,7 +424,8 @@ html, body {
         padding: 24px 20px;
     }
     
-    .feature-content h3 {
+    .feature-content h3,
+.feature-content .feature-title {
         font-size: 1.1rem;
         margin-bottom: 8px;
     }
@@ -531,7 +533,8 @@ html, body {
         padding: 20px 16px;
     }
     
-    .feature-content h3 {
+    .feature-content h3,
+.feature-content .feature-title {
         font-size: 1.05rem;
     }
     
