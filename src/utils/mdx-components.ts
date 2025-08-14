@@ -18,6 +18,8 @@ import DataTable from '../components/DataTable.astro';
 import FeatureList from '../components/FeatureList.astro';
 import QuoteSection from '../components/QuoteSection.astro';
 import MessageBox from '../components/MessageBox.astro';
+import ArticleCrossLink from '../components/ArticleCrossLink.astro';
+import ArticleCrossLinks from '../components/ArticleCrossLinks.astro';
 
 /**
  * MDXで利用可能なコンポーネント一覧
@@ -45,6 +47,10 @@ export const mdxComponents = {
   
   // メディアコンポーネント
   ImageCard,
+  
+  // 記事間リンクコンポーネント
+  ArticleCrossLink,
+  ArticleCrossLinks,
 };
 
 /**
